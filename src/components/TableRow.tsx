@@ -1,6 +1,7 @@
 import React from 'react'
+import { User } from '../types'
 
-export function TableRow({user}: any) {
+export function TableRow({user}: {user: User}) {
   return (
     <tr key={user.id} className="hover:bg-gray-700">
     <td className="py-4 px-4 whitespace-nowrap text-sm font-medium text-white">{user.name}</td>
