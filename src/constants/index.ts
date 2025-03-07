@@ -1,0 +1,4 @@
+export const ACTION_TYPES = {
+    UPDATE_FORM: 'UPDATE_FORM',
+    CLEAR_FORM: 'CLEAR_FORM'
+}

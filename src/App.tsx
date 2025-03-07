@@ -10,6 +10,7 @@ import { fetchUsers, selectUser } from "./redux/slices/userSlice";
 function App() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const dispatch = useAppDispatch()
+ 
   const users = useAppSelector(selectUser)
 
   const openModal = () => setIsModalOpen(true);
@@ -25,14 +26,13 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 p-6">
-
       <Header openModal={openModal} /> 
       <Search />
 
        <Table users={users} />        
 
         {isModalOpen && (
-          <Modal closeModal={closeModal} />
+          <Modal closeModal={closeModal}  />
         )}
       
     

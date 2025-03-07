@@ -17,7 +17,7 @@ export default function Table({users}: {users: User[]}) {
             </thead>
             <tbody className="divide-y divide-gray-700">
               {users.map((user: User) => (
-                <TableRow user={user} /> 
+                <TableRow key={user.id} user={user} /> 
               ))}
             </tbody>
           </table>

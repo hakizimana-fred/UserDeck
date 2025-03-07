@@ -1,5 +1,47 @@
+import { useReducer, useState } from "react";
+import formReducer, { initialFormState } from "../redux/reducers/form";
+import { ACTION_TYPES } from "../constants";
+import { useAppDispatch } from "../hooks/useRedux";
+import { addUser } from "../redux/slices/userSlice";
+
 
 export function Modal({closeModal}: {closeModal: () => void}) {
+   const [formState, dispatchForm] = useReducer(formReducer, initialFormState)
+   const { name, email, phone } = formState
+   const dispatch = useAppDispatch()
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
+  
+
+   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatchForm({ 
+        type: ACTION_TYPES.UPDATE_FORM,  
+        payload: { name: e.target.name, value: e.target.value }
+    });
+  };
+
+   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+      if (!validateForm(formState)) return
+      dispatch(addUser({ ...formState}))
+      dispatchForm({ type: ACTION_TYPES.CLEAR_FORM, payload: { name: '', value: '' } })
+      setFormErrors({})
+   }
+
+   function validateForm(values: {name: string, email: string, phone: string}): boolean {
+      if (!values.name) {
+        setFormErrors((prev) => ({ ...prev, name: "Name is required" }));
+        return false
+      }else if (!values.email) {
+        setFormErrors((prev) => ({ ...prev, email: "Email is required" }));
+        return false
+      }else if (!values.phone) {
+        setFormErrors((prev) => ({ ...prev, phone: "Phone is required" }));
+        return false
+      }
+      return true
+   }
+  
+
   return (
      <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -18,7 +60,7 @@ export function Modal({closeModal}: {closeModal: () => void}) {
                       <h3 className="text-lg leading-6 font-medium text-white mb-6">
                         Create New User
                       </h3>
-                      <form  className="space-y-4">
+                      <form  className="space-y-4" onSubmit={handleSubmit}>
                         <div>
                           <label htmlFor="name" className="block text-sm font-medium text-gray-400 mb-1">
                             Name
@@ -27,11 +69,12 @@ export function Modal({closeModal}: {closeModal: () => void}) {
                             type="text"
                             name="name"
                             id="name"
-                           
+                            value={name}
+                            onChange={handleChange}
                             placeholder="Name"
-                            required
                             className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                           />
+                          {formErrors.name && <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>}
                         </div>
                         <div>
                           <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-1">
@@ -41,11 +84,12 @@ export function Modal({closeModal}: {closeModal: () => void}) {
                             type="email"
                             name="email"
                             id="email"
-                          
+                            value={email}
+                            onChange={handleChange}
                             placeholder="Email"
-                            required
                             className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                           />
+                           {formErrors.email && <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>}
                         </div>
                         <div>
                           <label htmlFor="phone" className="block text-sm font-medium text-gray-400 mb-1">
@@ -55,23 +99,26 @@ export function Modal({closeModal}: {closeModal: () => void}) {
                             type="text"
                             name="phone"
                             id="phone"
-                          
+                            value={phone}
+                            onChange={handleChange}
                             placeholder="Phone"
                             className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                           />
+                           {formErrors.phone && <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>}
                         </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                  <button
-                    type="button"
+                        <button
+                    type="submit"
                  
                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-emerald-600 text-base font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-200"
                   >
                     Add User
                   </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                  
                   <button
                     type="button"
                     onClick={closeModal} 
@@ -80,6 +127,7 @@ export function Modal({closeModal}: {closeModal: () => void}) {
                     Cancel
                   </button>
                 </div>
+
               </div>
             </div>
           </div>

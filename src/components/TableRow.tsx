@@ -1,7 +1,19 @@
 import React from 'react'
 import { User } from '../types'
+import { useAppDispatch } from '../hooks/useRedux'
+import { deleteUser } from '../redux/slices/userSlice'
+
+
 
 export function TableRow({user}: {user: User}) {
+  const dispatch = useAppDispatch()
+
+  const handleDelete = (id: string) => {
+    const isConfirmed = window.confirm("Are you sure you want to delete this user?");
+    if (isConfirmed) {
+        dispatch(deleteUser(id));
+    }
+  }
   return (
     <tr key={user.id} className="hover:bg-gray-700">
     <td className="py-4 px-4 whitespace-nowrap text-sm font-medium text-white">{user.name}</td>
@@ -15,6 +27,7 @@ export function TableRow({user}: {user: User}) {
       </button>
       <button 
         className="text-red-400 hover:text-red-300 transition-colors duration-200"
+        onClick={() => handleDelete(user?.id)}
       >
         Delete
       </button>
