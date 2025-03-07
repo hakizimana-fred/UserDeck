@@ -1,4 +1,3 @@
-import React from 'react'
 import { User } from '../types'
 import { useAppDispatch } from '../hooks/useRedux'
 import { deleteUser } from '../redux/slices/userSlice'
