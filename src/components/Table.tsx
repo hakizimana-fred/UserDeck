@@ -1,7 +1,7 @@
 import { User } from '../types'
 import { TableRow } from './TableRow'
 
-export default function Table({users}: {users: User[]}) {
+export default function Table({users, openModal}: {users: User[], openModal?: () => void}) {
 
   return (
     <div className="overflow-x-auto rounded-lg shadow">
@@ -16,7 +16,7 @@ export default function Table({users}: {users: User[]}) {
             </thead>
             <tbody className="divide-y divide-gray-700">
               {users.map((user: User) => (
-                <TableRow key={user.id} user={user} /> 
+                <TableRow openModal={openModal} key={user.id} user={user} /> 
               ))}
             </tbody>
           </table>

@@ -1,16 +1,26 @@
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import formReducer, { initialFormState } from "../redux/reducers/form";
 import { ACTION_TYPES } from "../constants";
-import { useAppDispatch } from "../hooks/useRedux";
-import { addUser } from "../redux/slices/userSlice";
+import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
+import { addUser, editingUser, isEditing, stopEditing, updateUser } from "../redux/slices/userSlice";
 
 
 export function Modal({closeModal}: {closeModal: () => void}) {
-   const [formState, dispatchForm] = useReducer(formReducer, initialFormState)
-   const { name, email, phone } = formState
-   const dispatch = useAppDispatch()
+  const [formState, dispatchForm] = useReducer(formReducer, initialFormState)
+  const { name, email, phone } = formState
+  const dispatch = useAppDispatch()
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
-  
+  const isUserEdit = useAppSelector(isEditing)
+  const editingUserValue = useAppSelector(editingUser) 
+
+
+  useEffect(() => {
+    if (isUserEdit && editingUserValue) {
+      dispatchForm({ type: ACTION_TYPES.UPDATE_FORM, payload: { name: 'name', value: editingUserValue.name } })
+      dispatchForm({ type: ACTION_TYPES.UPDATE_FORM, payload: { name: 'email', value: editingUserValue.email } })
+      dispatchForm({ type: ACTION_TYPES.UPDATE_FORM, payload: { name: 'phone', value: editingUserValue.phone } })
+    }
+  }, [editingUserValue, isUserEdit])
 
    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatchForm({ 
@@ -22,9 +32,16 @@ export function Modal({closeModal}: {closeModal: () => void}) {
    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
       if (!validateForm(formState)) return
-      dispatch(addUser({ ...formState}))
-      dispatchForm({ type: ACTION_TYPES.CLEAR_FORM, payload: { name: '', value: '' } })
-      setFormErrors({})
+      if (isUserEdit && editingUserValue) {
+        dispatch(updateUser({id: editingUserValue.id, name, email, phone}))
+        dispatch({ type: ACTION_TYPES.CLEAR_FORM, payload: { name: '', value: '' } })
+        setFormErrors({})
+      }else {
+
+        dispatch(addUser({ ...formState}))
+        dispatchForm({ type: ACTION_TYPES.CLEAR_FORM, payload: { name: '', value: '' } })
+        setFormErrors({})
+      }
    }
 
    function validateForm(values: {name: string, email: string, phone: string}): boolean {
@@ -121,7 +138,10 @@ export function Modal({closeModal}: {closeModal: () => void}) {
                   
                   <button
                     type="button"
-                    onClick={closeModal} 
+                    onClick={() => {
+                      closeModal()
+                      dispatch(stopEditing())
+                    }} 
                     className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-500 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-200"
                   >
                     Cancel

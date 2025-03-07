@@ -40,7 +40,7 @@ function App() {
       <Header openModal={openModal} /> 
       <Search value={searchTerm} ref={searchRef} onChange={handleSearchChange}  />
 
-       <Table users={filteredUsers} />        
+       <Table users={filteredUsers} openModal={openModal} />        
 
         {isModalOpen && (
           <Modal closeModal={closeModal}  />
